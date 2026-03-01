@@ -12,24 +12,26 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Reconstruction (إعادة الهيكلة)
+      - name: Full Reconstruction & Internet Fix (التطهير وفتح الإنترنت)
         run: |
-          # حذف المجلدات القديمة المعطوبة
+          # 1. حذف المجلدات القديمة لضمان عدم وجود ملفات معطوبة
           rm -rf android
-          rm -rf ios
           rm -f pubspec.lock
           
-          # إجبار فلاتر على إنشاء ملفات نظام أندرويد جديدة وحديثة
+          # 2. إنشاء مجلد أندرويد جديد بأحدث الأدوات (لحل مشكلة الأدوات القديمة)
           flutter create . --platforms android
           
-          # إعادة إضافة المكتبات اللازمة لملف pubspec الجديد
-          flutter pub add http url_launcher
+          # 3. إضافة تصريح الإنترنت (لحل مشكلة فشل الاتصال بالسحاب)
+          sed -i '/<application/i \    <uses-permission android:name="android.permission.INTERNET"/>' android/app/src/main/AndroidManifest.xml
           
-      - name: Build New APK
+          # 4. تحديث المكتبات
+          flutter pub get
+
+      - name: Build Final Protected APK
         run: flutter build apk --release --no-tree-shake-icons
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Tiger-Success-APK
+          name: Tiger-Ultimate-Fix
           path: build/app/outputs/flutter-apk/app-release.apk
