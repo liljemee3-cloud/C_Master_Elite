@@ -3,7 +3,12 @@ import 'cyber_c.dart';
 import 'ai_python.dart';
 import 'updater.dart';
 
-void main() => runApp(const MaterialApp(home: MainScreen(), debugShowCheckedModeBanner: false));
+void main() {
+  runApp(const MaterialApp(
+    home: MainScreen(),
+    debugShowCheckedModeBanner: false,
+  ));
+}
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -15,44 +20,98 @@ class MainScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("C Master Elite"),
         backgroundColor: Colors.amber[900],
+        // أيقونة القائمة الجانبية 🟰 تظهر تلقائياً هنا
       ),
-      // القائمة الجانبية المخفية 🟰
+      
+      // القائمة الجانبية (Drawer) حيث أخفينا زر التحديث
       drawer: Drawer(
         backgroundColor: Colors.grey[900],
         child: ListView(
+          padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(child: Center(child: Text("الإعدادات", style: TextStyle(color: Colors.white, fontSize: 24)))),
+            DrawerHeader(
+              decoration: BoxDecoration(color: Colors.amber[900]),
+              child: const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.terminal, color: Colors.white, size: 50),
+                  SizedBox(height: 10),
+                  Text("إعدادات النظام", style: TextStyle(color: Colors.white, fontSize: 20)),
+                ],
+              ),
+            ),
             ListTile(
-              leading: const Icon(Icons.update, color: Colors.amber),
+              leading: const Icon(Icons.cloud_download, color: Colors.amber),
               title: const Text("ابحث عن تحديثات", style: TextStyle(color: Colors.white)),
-              onTap: () => AppUpdater().check(context), // استدعاء التحديث من ملفه الخاص
+              onTap: () {
+                Navigator.pop(context); // إغلاق القائمة أولاً
+                AppUpdater().check(context); // تشغيل نظام التحديث الذكي من ملفه
+              },
+            ),
+            const Divider(color: Colors.grey),
+            ListTile(
+              leading: const Icon(Icons.info_outline, color: Colors.grey),
+              title: const Text("الإصدار الحالي: 1.0.0", style: TextStyle(color: Colors.grey)),
+              onTap: null,
             ),
           ],
         ),
       ),
-      body: Center(
+
+      body: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildBigButton(context, "اللغة C والأمن السيبراني", Icons.security, const CyberCScreen()),
+            const Icon(Icons.code, size: 80, color: Colors.amber),
+            const SizedBox(height: 40),
+            
+            // زر الدخول لعالم C والأمن السيبراني
+            _buildMenuButton(
+              context, 
+              "اللغة C والأمن السيبراني", 
+              Icons.security, 
+              const CyberCScreen(),
+              Colors.blueGrey[900]!
+            ),
+            
             const SizedBox(height: 20),
-            _buildBigButton(context, "الذكاء الاصطناعي وبايثون", Icons.psychology, const AIPythonScreen()),
+            
+            // زر الدخول لعالم بايثون والذكاء الاصطناعي
+            _buildMenuButton(
+              context, 
+              "الذكاء الاصطناعي وبايثون", 
+              Icons.psychology, 
+              const AIPythonScreen(),
+              Colors.indigo[900]!
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBigButton(BuildContext context, String title, IconData icon, Widget screen) {
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.amber[900],
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+  // خوارزمية بناء الأزرار الموحدة لتجنب التكرار
+  Widget _buildMenuButton(BuildContext context, String title, IconData icon, Widget screen, Color color) {
+    return SizedBox(
+      width: double.infinity,
+      height: 70,
+      child: ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          elevation: 5,
+        ),
+        icon: Icon(icon, color: Colors.amber, size: 28),
+        label: Text(
+          title, 
+          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)
+        ),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+        },
       ),
-      icon: Icon(icon, color: Colors.white),
-      label: Text(title, style: const TextStyle(fontSize: 18, color: Colors.white)),
-      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => screen)),
     );
   }
 }
