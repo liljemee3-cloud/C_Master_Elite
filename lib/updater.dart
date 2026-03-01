@@ -1,116 +1,100 @@
 import 'package:flutter/material.dart';
-import 'cyber_c.dart';
-import 'ai_python.dart';
-import 'updater.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
-void main() {
-  runApp(const MaterialApp(
-    home: MainScreen(),
-    debugShowCheckedModeBanner: false,
-  ));
-}
+class AppUpdater {
+  // هذا هو الإصدار الذي تضعه في التطبيق يدوياً كل مرة
+  final String currentVersion = "1.0.0"; 
 
-class MainScreen extends StatelessWidget {
-  const MainScreen({super.key});
+  Future<void> check(BuildContext context) async {
+    // إظهار رسالة "جاري البحث..."
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("جاري البحث عن تحديثات..."), duration: Duration(seconds: 1)),
+    );
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: const Text("C Master Elite"),
-        backgroundColor: Colors.amber[900],
-        // أيقونة القائمة الجانبية 🟰 تظهر تلقائياً هنا
-      ),
-      
-      // القائمة الجانبية (Drawer) حيث أخفينا زر التحديث
-      drawer: Drawer(
+    final url = 'https://raw.githubusercontent.com/liljemee3-cloud/C_Master_Elite/main/version.json';
+    
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        String cloudVersion = data['latest_version'];
+
+        if (cloudVersion != currentVersion) {
+          _showUpdateDialog(context, cloudVersion, data['url']);
+        } else {
+          _showStatusDialog(context, "لا توجد نسخة جديدة", "تطبيقك محدث بالكامل (V $currentVersion)");
+        }
+      }
+    } catch (e) {
+      _showStatusDialog(context, "فشل الاتصال", "تأكد من اتصالك بالإنترنت وحاول مجدداً.");
+    }
+  }
+
+  void _showUpdateDialog(BuildContext context, String version, String downloadUrl) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
         backgroundColor: Colors.grey[900],
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(color: Colors.amber[900]),
-              child: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.terminal, color: Colors.white, size: 50),
-                  SizedBox(height: 10),
-                  Text("إعدادات النظام", style: TextStyle(color: Colors.white, fontSize: 20)),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.cloud_download, color: Colors.amber),
-              title: const Text("ابحث عن تحديثات", style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context); // إغلاق القائمة أولاً
-                AppUpdater().check(context); // تشغيل نظام التحديث الذكي من ملفه
-              },
-            ),
-            const Divider(color: Colors.grey),
-            ListTile(
-              leading: const Icon(Icons.info_outline, color: Colors.grey),
-              title: const Text("الإصدار الحالي: 1.0.0", style: TextStyle(color: Colors.grey)),
-              onTap: null,
-            ),
-          ],
-        ),
-      ),
-
-      body: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.code, size: 80, color: Colors.amber),
-            const SizedBox(height: 40),
-            
-            // زر الدخول لعالم C والأمن السيبراني
-            _buildMenuButton(
-              context, 
-              "اللغة C والأمن السيبراني", 
-              Icons.security, 
-              const CyberCScreen(),
-              Colors.blueGrey[900]!
-            ),
-            
-            const SizedBox(height: 20),
-            
-            // زر الدخول لعالم بايثون والذكاء الاصطناعي
-            _buildMenuButton(
-              context, 
-              "الذكاء الاصطناعي وبايثون", 
-              Icons.psychology, 
-              const AIPythonScreen(),
-              Colors.indigo[900]!
-            ),
-          ],
-        ),
+        title: Text("نسخة جديدة متوفرة ($version)", style: const TextStyle(color: Colors.amber)),
+        content: const Text("تم رصد معلومات جديدة في السحاب. هل تريد البدء بالتحديث؟", style: TextStyle(color: Colors.white)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("ليس الآن")),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+            onPressed: () {
+              Navigator.pop(context);
+              _simulateDownload(context, downloadUrl);
+            },
+            child: const Text("تحديث الآن"),
+          ),
+        ],
       ),
     );
   }
 
-  // خوارزمية بناء الأزرار الموحدة لتجنب التكرار
-  Widget _buildMenuButton(BuildContext context, String title, IconData icon, Widget screen, Color color) {
-    return SizedBox(
-      width: double.infinity,
-      height: 70,
-      child: ElevatedButton.icon(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          elevation: 5,
-        ),
-        icon: Icon(icon, color: Colors.amber, size: 28),
-        label: Text(
-          title, 
-          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)
-        ),
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+  void _simulateDownload(BuildContext context, String url) async {
+    // إظهار واجهة "جارٍ التحديث" مع خط التقدم
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            backgroundColor: Colors.black,
+            title: const Text("جارٍ التحميل...", style: TextStyle(color: Colors.white)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const LinearProgressIndicator(color: Colors.amber),
+                const SizedBox(height: 20),
+                const Text("يتم الآن جلب البيانات الجديدة من السحاب", style: TextStyle(color: Colors.grey)),
+              ],
+            ),
+          );
         },
+      ),
+    );
+
+    // الانتظار قليلاً لمحاكاة التحميل ثم فتح الرابط
+    await Future.delayed(const Duration(seconds: 3));
+    Navigator.pop(context); // إغلاق نافذة التحميل
+    
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      _showStatusDialog(context, "تم التحميل", "يرجى تثبيت الملف الذي تم تحميله لتظهر المعلومات الجديدة.");
+    }
+  }
+
+  void _showStatusDialog(BuildContext context, String title, String msg) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(msg),
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("حسناً"))],
       ),
     );
   }
