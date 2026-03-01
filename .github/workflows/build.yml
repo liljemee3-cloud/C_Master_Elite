@@ -6,21 +6,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
 
-      - name: Clean and Build
+      - name: Force Clean and Repair
         run: |
-          # تنظيف أي مخلفات قديمة
-          flutter clean
+          # مسح أي إعدادات قديمة تسبب الفشل
+          rm -rf android/build
+          rm -rf android/.gradle
+          rm -f pubspec.lock
+          
+          # جلب المكتبات من جديد
           flutter pub get
-          # بناء التطبيق بهوية جديدة ليتجاوز الحظر في هاتفك
-          flutter build apk --release
+          
+      - name: Build Global APK
+        run: flutter build apk --release --no-tree-shake-icons
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Tiger-Pure-APK
+          name: Tiger-Elite-Final
           path: build/app/outputs/flutter-apk/app-release.apk
-          
