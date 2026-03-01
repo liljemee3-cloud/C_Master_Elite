@@ -12,21 +12,24 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Force Clean and Repair
+      - name: Reconstruction (إعادة الهيكلة)
         run: |
-          # مسح أي إعدادات قديمة تسبب الفشل
-          rm -rf android/build
-          rm -rf android/.gradle
+          # حذف المجلدات القديمة المعطوبة
+          rm -rf android
+          rm -rf ios
           rm -f pubspec.lock
           
-          # جلب المكتبات من جديد
-          flutter pub get
+          # إجبار فلاتر على إنشاء ملفات نظام أندرويد جديدة وحديثة
+          flutter create . --platforms android
           
-      - name: Build Global APK
+          # إعادة إضافة المكتبات اللازمة لملف pubspec الجديد
+          flutter pub add http url_launcher
+          
+      - name: Build New APK
         run: flutter build apk --release --no-tree-shake-icons
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Tiger-Elite-Final
+          name: Tiger-Success-APK
           path: build/app/outputs/flutter-apk/app-release.apk
