@@ -3,19 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
-void main() => runApp(const CMasterElite());
-
-class CMasterElite extends StatelessWidget {
-  const CMasterElite({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(),
-      home: const HomeScreen(),
-    );
-  }
-}
+void main() => runApp(const MaterialApp(home: HomeScreen()));
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,7 +12,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final String currentVersion = "1.0.0"; // إصدارك الحالي
+  final String currentVersion = "1.0.0"; // النسخة "القديمة" عمداً
 
   @override
   void initState() {
@@ -33,30 +21,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> checkUpdates() async {
+    // أضفنا رقم عشوائي للرابط لنجبر المتصفح على جلب النسخة الجديدة وليس المخزنة
+    final url = 'https://raw.githubusercontent.com/liljemee3-cloud/C_Master_Elite/main/version.json?v=${DateTime.now().millisecondsSinceEpoch}';
     try {
-      final response = await http.get(Uri.parse('https://raw.githubusercontent.com/liljemee3-cloud/C_Master_Elite/main/version.json'));
+      final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['latest_version'] != currentVersion) {
-          _showUpdateDialog(data['url']);
+          _showDialog(data['url']);
         }
       }
-    } catch (e) {
-      debugPrint("خطأ اتصال: $e");
-    }
+    } catch (e) { print(e); }
   }
 
-  void _showUpdateDialog(String url) {
+  void _showDialog(String url) {
     showDialog(
       context: context,
-      barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text("🚀 تحديث جديد!"),
-        content: const Text("هل تريد تجربة نظام التحديث التلقائي؟"),
+        title: const Text("🚀 انتصار النمر!"),
+        content: const Text("إذا رأيت هذه الرسالة، فنظام التحديث قد كسر الحصار بنجاح."),
         actions: [
-          ElevatedButton(onPressed: () async {
-            await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-          }, child: const Text("تحديث الآن")),
+          TextButton(onPressed: () => launchUrl(Uri.parse(url)), child: const Text("تحديث الآن")),
         ],
       ),
     );
@@ -64,8 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(child: Text("النسخة الحالية: $currentVersion\nانتظر التحديث...", textAlign: TextAlign.center)),
-    );
+    return const Scaffold(body: Center(child: Text("جاري فحص التحديث السحابي...")));
   }
 }
