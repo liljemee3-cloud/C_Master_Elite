@@ -12,7 +12,7 @@ class CyberCScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         children: [
           _lessonCard("أساسيات لغة C", "المؤشرات، العناوين، وإدارة الذاكرة."),
-          _lessonCard("الأمن السيبراني", "كيف يتم استغلال ثغرات الذاكرة (Buffer Overflow)."),
+          _lessonCard("الأمن الس&يبراني", "كيف يتم استغلال ثغرات الذاكرة (Buffer Overflow)."),
         ],
       ),
     );
