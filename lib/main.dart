@@ -16,7 +16,7 @@ class CMasterHome extends StatefulWidget {
 
 class _CMasterHomeState extends State<CMasterHome> {
   // الإصدار الحالي في هاتفك (سنعتبره 1.0.0 لنختبر التحديث)
-  final String currentVersion = "1.0.0";
+  final String currentVersion = "3.0.0";
 
   @override
   void initState() {
