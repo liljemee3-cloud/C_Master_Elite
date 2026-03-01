@@ -55,7 +55,7 @@ class _CMasterHomeState extends State<CMasterHome> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text("🚀 تحديث جديد!"),
+        title: const Text("🚀 تحديثوا جديد!"),
         content: const Text("هل تريد الانتقال لنسخة لغة C؟"),
         actions: [
           ElevatedButton(
