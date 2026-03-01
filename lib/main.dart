@@ -36,7 +36,7 @@ class MainScreen extends StatelessWidget {
                 children: [
                   Icon(Icons.terminal, color: Colors.white, size: 50),
                   SizedBox(height: 10),
-                  Text("إعدادات النظام", style: TextStyle(color: Colors.white, fontSize: 20)),
+                  Text("إعدادات النظام الذكي", style: TextStyle(color: Colors.white, fontSize: 20)),
                 ],
               ),
             ),
