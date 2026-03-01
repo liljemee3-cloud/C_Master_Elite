@@ -1,83 +1,58 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:url_launcher/url_launcher.dart';
+import 'cyber_c.dart';
+import 'ai_python.dart';
+import 'updater.dart';
 
-void main() => runApp(const MaterialApp(home: CMasterHome()));
+void main() => runApp(const MaterialApp(home: MainScreen(), debugShowCheckedModeBanner: false));
 
-class CMasterHome extends StatefulWidget {
-  const CMasterHome({super.key});
-  @override
-  State<CMasterHome> createState() => _CMasterHomeState();
-}
-
-class _CMasterHomeState extends State<CMasterHome> {
-  final String currentVersion = "1.0.0"; 
-  String statusMessage = "جاري الاتصال بالسحاب...";
-
-  @override
-  void initState() {
-    super.initState();
-    checkUpdates();
-  }
-
-  Future<void> checkUpdates() async {
-    // الرابط المباشر (تأكد من كتابة اسم مستخدم GitHub الخاص بك بدلاً من liljemee3-cloud إذا كان مختلفاً)
-    final url = 'https://raw.githubusercontent.com/liljemee3-cloud/C_Master_Elite/main/version.json';
-    
-    try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        String cloudVersion = data['latest_version'];
-        
-        setState(() {
-          statusMessage = "نجح الاتصال! نسخة السحاب هي: $cloudVersion";
-        });
-
-        if (cloudVersion != currentVersion) {
-          _showUpdateDialog(data['url']);
-        }
-      } else {
-        setState(() {
-          statusMessage = "فشل الاتصال: كود الخطأ ${response.statusCode}";
-        });
-      }
-    } catch (e) {
-      setState(() {
-        statusMessage = "خطأ تقني: $e";
-      });
-    }
-  }
-
-  void _showUpdateDialog(String downloadUrl) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text("🚀 تحديثوا جديد!"),
-        content: const Text("هل تريد الانتقال لنسخة لغة C؟"),
-        actions: [
-          ElevatedButton(
-            onPressed: () => launchUrl(Uri.parse(downloadUrl), mode: LaunchMode.externalApplication),
-            child: const Text("تحديث الآن"),
-          ),
-        ],
-      ),
-    );
-  }
+class MainScreen extends StatelessWidget {
+  const MainScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Center(
-        child: Text(
-          statusMessage,
-          style: const TextStyle(color: Colors.amber, fontSize: 18),
-          textAlign: TextAlign.center,
+      appBar: AppBar(
+        title: const Text("C Master Elite"),
+        backgroundColor: Colors.amber[900],
+      ),
+      // القائمة الجانبية المخفية 🟰
+      drawer: Drawer(
+        backgroundColor: Colors.grey[900],
+        child: ListView(
+          children: [
+            const DrawerHeader(child: Center(child: Text("الإعدادات", style: TextStyle(color: Colors.white, fontSize: 24)))),
+            ListTile(
+              leading: const Icon(Icons.update, color: Colors.amber),
+              title: const Text("ابحث عن تحديثات", style: TextStyle(color: Colors.white)),
+              onTap: () => AppUpdater().check(context), // استدعاء التحديث من ملفه الخاص
+            ),
+          ],
         ),
       ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildBigButton(context, "اللغة C والأمن السيبراني", Icons.security, const CyberCScreen()),
+            const SizedBox(height: 20),
+            _buildBigButton(context, "الذكاء الاصطناعي وبايثون", Icons.psychology, const AIPythonScreen()),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBigButton(BuildContext context, String title, IconData icon, Widget screen) {
+    return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.amber[900],
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      ),
+      icon: Icon(icon, color: Colors.white),
+      label: Text(title, style: const TextStyle(fontSize: 18, color: Colors.white)),
+      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => screen)),
     );
   }
 }
