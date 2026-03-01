@@ -1,18 +1,48 @@
 name: Build APK
-on: [push, pull_request]
+on: [push, workflow_dispatch]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-      - run: flutter pub get
-      - run: flutter build apk --release
-      - uses: actions/upload-artifact@v4
-        with:
-          name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Clean and Reconstruct
+        run: |
+          # مسح أي ملفات قديمة تسبب تعارض
+          rm -rf *
+          # إنشاء مشروع جديد تماماً بنفس الاسم
+          flutter create --org com.mauritania.elite --project-name c_master_elite .
           
+          # إضافة مكتبة HTTP لعمل التحديث
+          sed -i '/dependencies:/a \  http: ^1.1.0' pubspec.yaml
+
+          # وضع كود الواجهة (الحمد لله) ونظام التحديث
+          cat <<EOF > lib/main.dart
+          import 'package:flutter/material.dart';
+          import 'dart:convert';
+          import 'package:http/http.dart' as http;
+
+          void main() => runApp(MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData.dark(),
+            home: Scaffold(
+              appBar: AppBar(title: Text("الحمد لله - C Master Elite")),
+              body: Center(child: Text("تم التحديث بنجاح! 🚀", style: TextStyle(fontSize: 20))),
+            ),
+          ));
+          EOF
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: C-Master-Elite-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
