@@ -1,16 +1,42 @@
-name: c_master_elite
-description: "C Master Elite Project"
-publish_to: 'none'
-version: 2.0.0+2
+name: Build APK
+on: [push, workflow_dispatch]
 
-environment:
-  sdk: '>=3.0.0 <4.0.0'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
 
-dependencies:
-  flutter:
-    sdk: flutter
-  http: ^1.1.0
-  url_launcher: ^6.2.5
+      - name: Clean Start
+        run: |
+          rm -rf *
+          # هنا السر: اسم حزمة جديد تماماً ليقبله الهاتف كشيء لم يره من قبل
+          flutter create --org com.tiger --project-name pro_master .
+          
+          # إضافة المكتبات اللازمة
+          sed -i '/dependencies:/a \  http: ^1.1.0\n  url_launcher: ^6.2.5' pubspec.yaml
 
-flutter:
-  uses-material-design: true
+          # وضع كود "فرس التحديث" الجديد
+          cat <<EOF > lib/main.dart
+          import 'package:flutter/material.dart';
+          void main() => runApp(MaterialApp(
+            theme: ThemeData.dark(),
+            home: Scaffold(
+              appBar: AppBar(title: Text("نسخة النمر الأصلية V1")),
+              body: Center(child: Text("إذا رأيت هذا، فقد انتصرنا على القديم! ✅", 
+              style: TextStyle(fontSize: 20, color: Colors.amber))),
+            ),
+          ));
+          EOF
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Tiger-Pure-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
