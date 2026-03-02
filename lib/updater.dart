@@ -5,7 +5,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter/material.dart';
 
 class AppUpdater {
-  // هذا الرابط يجب أن يكون "Raw" لملف version.json
+  // الرابط الخام لملف التحديث في مستودعك
   static const String jsonUrl = "https://raw.githubusercontent.com/liljemee3-cloud/C_Master_Elite/main/version.json";
 
   static Future<void> checkForUpdate(BuildContext context) async {
@@ -20,19 +20,20 @@ class AppUpdater {
         PackageInfo packageInfo = await PackageInfo.fromPlatform();
         String currentVersion = packageInfo.version;
 
+        // إذا كان الإصدار السحابي يختلف عن إصدار الهاتف، اظهر نافذة التحديث
         if (latestVersion != currentVersion) {
           _showUpdateDialog(context, latestVersion, downloadUrl);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("تطبيقك محدث بالفعل")),
+            const SnackBar(content: Text("تطبيقك محدث لآخر إصدار")),
           );
         }
       } else {
-        throw "فشل الوصول للملف: ${response.statusCode}";
+        throw "فشل الوصول للسيرفر: ${response.statusCode}";
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("خطأ في الاتصال: $e")),
+        SnackBar(content: Text("فشل الاتصال: $e")),
       );
     }
   }
@@ -40,14 +41,15 @@ class AppUpdater {
   static void _showUpdateDialog(BuildContext context, String version, String url) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text("تحديث جديد متوفر"),
-        content: Text("إصدار جديد ($version) متاح الآن. هل تريد التحديث؟"),
+        title: const Text("تحديث جديد متوفر 🚀"),
+        content: Text("إصدار جديد ($version) جاهز للتحميل. هل تريد التحديث الآن؟"),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("لاحقاً")),
           ElevatedButton(
             onPressed: () => _launchURL(url),
-            child: const Text("تحديث الآن"),
+            child: const Text("تحميل التحديث"),
           ),
         ],
       ),
