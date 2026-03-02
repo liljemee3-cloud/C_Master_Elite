@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 class AppUpdater {
   // الرابط الخام لملف التحديث في مستودعك
-  static const String jsonUrl = "https://raw.githubusercontent.com/liljemee3-cloud/C_Master_Elite/main/version.json";
+  static const String jsonUrl = "https://github.com/liljemee3-cloud/C_Master_Elite/raw/refs/heads/main/version.json";
 
   static Future<void> checkForUpdate(BuildContext context) async {
     try {
