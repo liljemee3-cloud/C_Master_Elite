@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const Icon(Icons.code, size: 100, color: Colors.orange),
               const SizedBox(height: 20),
               const Text(
-                'مرحباً بك في عالم البرمجة بلغة C',
+                'مرحباً بك فــــي عالم البرمجة بلغة C',
                 style: TextStyle(color: Colors.white, fontSize: 20),
               ),
               const SizedBox(height: 40),
