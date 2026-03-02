@@ -27,7 +27,7 @@ class _MainKnowledgeScreenState extends State<MainKnowledgeScreen> {
 
   Future<void> fetchLessons() async {
     // ⚠️⚠️⚠️ يـا نـمر: اسـتبدل الـرابط أدناه برابط الـ Raw الذي نسخته ⚠️⚠️⚠️
-    const String myRawUrl = "ضـع_الـرابط_هـنا"; 
+    const String myRawUrl = "https://github.com/liljemee3-cloud/C_Master_Elite/raw/refs/heads/main/lessons_data.json"; 
     
     try {
       final response = await http.get(Uri.parse(myRawUrl));
