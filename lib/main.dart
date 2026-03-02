@@ -36,7 +36,7 @@ class MainScreen extends StatelessWidget {
                 children: [
                   Icon(Icons.terminal, color: Colors.white, size: 50),
                   SizedBox(height: 10),
-                  Text("إعدادات النظام الذكي", style: TextStyle(color: Colors.white, fontSize: 20)),
+                  Text("إعدادات النظام الذكي والعاقل", style: TextStyle(color: Colors.white, fontSize: 20)),
                 ],
               ),
             ),
@@ -81,7 +81,7 @@ class MainScreen extends StatelessWidget {
             // زر الدخول لعالم بايثون والذكاء الاصطناعي
             _buildMenuButton(
               context, 
-              "الذكاء الاصطناعي وبايثون", 
+              "الذكاء الاصطناعي العاقل وبايثون", 
               Icons.psychology, 
               const AIPythonScreen(),
               Colors.indigo[900]!
