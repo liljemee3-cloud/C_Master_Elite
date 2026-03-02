@@ -1,77 +1,63 @@
-import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:flutter/material.dart';
 
 class AppUpdater {
-  final String currentVersion = "1.0.0"; 
+  // هذا الرابط يجب أن يكون "Raw" لملف version.json
+  static const String jsonUrl = "https://raw.githubusercontent.com/liljemee3-cloud/C_Master_Elite/main/version.json";
 
-  Future<void> check(BuildContext context) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const AlertDialog(
-        backgroundColor: Colors.black,
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircularProgressIndicator(color: Colors.amber),
-            SizedBox(height: 20),
-            Text("جاري فحص السحاب...", style: TextStyle(color: Colors.white)),
-          ],
-        ),
-      ),
-    );
-
-    final url = 'https://github.com/liljemee3-cloud/C_Master_Elite/raw/refs/heads/main/version.json';
-    
+  static Future<void> checkForUpdate(BuildContext context) async {
     try {
-      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
-      if (Navigator.canPop(context)) Navigator.pop(context);
-
+      final response = await http.get(Uri.parse(jsonUrl));
+      
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        if (data['latest_version'] != currentVersion) {
-          _showUpdateDialog(context, data['latest_version'], data['url']);
+        String latestVersion = data['latest_version'];
+        String downloadUrl = data['url'];
+
+        PackageInfo packageInfo = await PackageInfo.fromPlatform();
+        String currentVersion = packageInfo.version;
+
+        if (latestVersion != currentVersion) {
+          _showUpdateDialog(context, latestVersion, downloadUrl);
         } else {
-          _showSnackBar(context, "تطبيقك محدث ✅");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("تطبيقك محدث بالفعل")),
+          );
         }
+      } else {
+        throw "فشل الوصول للملف: ${response.statusCode}";
       }
     } catch (e) {
-      if (Navigator.canPop(context)) Navigator.pop(context);
-      _showSnackBar(context, "فشل الاتصال: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("خطأ في الاتصال: $e")),
+      );
     }
   }
 
-  void _showUpdateDialog(BuildContext context, String version, String downloadUrl) {
+  static void _showUpdateDialog(BuildContext context, String version, String url) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: Text("تحديث متوفر: $version", style: const TextStyle(color: Colors.amber)),
-        content: const Text("تم رصد دروس جديدة، هل تريد التحميل؟", style: TextStyle(color: Colors.white)),
+        title: const Text("تحديث جديد متوفر"),
+        content: Text("إصدار جديد ($version) متاح الآن. هل تريد التحديث؟"),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("لاحقاً")),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            onPressed: () async {
-              Navigator.pop(context);
-              final Uri _uri = Uri.parse(downloadUrl);
-              // وضع "الفتح الخارجي المباشر" لتجاوز قيود الحماية
-              try {
-                await launchUrl(_uri, mode: LaunchMode.externalApplication);
-              } catch (e) {
-                _showSnackBar(context, "خطأ في فتح الرابط، جرب يدوياً.");
-              }
-            },
-            child: const Text("تنزيل الآن"),
+            onPressed: () => _launchURL(url),
+            child: const Text("تحديث الآن"),
           ),
         ],
       ),
     );
   }
 
-  void _showSnackBar(BuildContext context, String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  static Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw 'تعذر فتح الرابط: $url';
+    }
   }
 }
