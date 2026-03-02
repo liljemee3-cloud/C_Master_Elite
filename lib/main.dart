@@ -51,7 +51,7 @@ class MainScreen extends StatelessWidget {
             const Divider(color: Colors.grey),
             ListTile(
               leading: const Icon(Icons.info_outline, color: Colors.grey),
-              title: const Text("الإصدار الحالي: 1.0.0", style: TextStyle(color: Colors.grey)),
+              title: const Text("الإصدار الحالي هو هذا ←: 1.0.0", style: TextStyle(color: Colors.grey)),
               onTap: null,
             ),
           ],
