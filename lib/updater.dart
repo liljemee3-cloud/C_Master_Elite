@@ -23,7 +23,7 @@ class AppUpdater {
       ),
     );
 
-    final url = 'https://raw.githubusercontent.com/liljemee3-cloud/C_Master_Elite/main/version.json';
+    final url = 'https://github.com/liljemee3-cloud/C_Master_Elite/raw/refs/heads/main/version.json';
     
     try {
       final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
