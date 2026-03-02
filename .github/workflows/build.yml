@@ -6,32 +6,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
 
-      - name: Full Reconstruction & Internet Fix (التطهير وفتح الإنترنت)
+      - name: Inject Permissions (فتح بوابة الروابط)
         run: |
-          # 1. حذف المجلدات القديمة لضمان عدم وجود ملفات معطوبة
-          rm -rf android
-          rm -f pubspec.lock
-          
-          # 2. إنشاء مجلد أندرويد جديد بأحدث الأدوات (لحل مشكلة الأدوات القديمة)
-          flutter create . --platforms android
-          
-          # 3. إضافة تصريح الإنترنت (لحل مشكلة فشل الاتصال بالسحاب)
-          sed -i '/<application/i \    <uses-permission android:name="android.permission.INTERNET"/>' android/app/src/main/AndroidManifest.xml
-          
-          # 4. تحديث المكتبات
+          # إضافة تصريح الإنترنت وفتح الروابط الخارجية
+          sed -i '/<application/i \    <uses-permission android:name="android.permission.INTERNET"/>\n    <queries>\n        <intent>\n            <action android:name="android.intent.action.VIEW" />\n            <category android:name="android.intent.category.BROWSABLE" />\n            <data android:scheme="https" />\n        </intent>\n    </queries>' android/app/src/main/AndroidManifest.xml
           flutter pub get
 
-      - name: Build Final Protected APK
+      - name: Build Final APK
         run: flutter build apk --release --no-tree-shake-icons
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Tiger-Ultimate-Fix
+          name: Tiger-Final-Power
           path: build/app/outputs/flutter-apk/app-release.apk
