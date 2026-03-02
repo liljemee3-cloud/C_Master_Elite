@@ -42,7 +42,7 @@ class MainScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.cloud_download, color: Colors.amber),
-              title: const Text("ابحث عن تحديثات", style: TextStyle(color: Colors.white)),
+              title: const Text("ابحث عنه قبل ان تموت تحديثات", style: TextStyle(color: Colors.white)),
               onTap: () {
                 Navigator.pop(context); // إغلاق القائمة أولاً
                 AppUpdater().check(context); // تشغيل نظام التحديث الذكي من ملفه
