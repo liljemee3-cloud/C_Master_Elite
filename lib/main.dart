@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'science_data.dart';
+import 'visual_assets.dart';
 
 void main() => runApp(const CMasterApp());
 
@@ -10,68 +10,46 @@ class CMasterApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(primaryColor: Colors.orange),
-      home: const MainKnowledgeScreen(),
+      theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: Colors.black),
+      home: const AcademyHomeScreen(),
     );
   }
 }
 
-class MainKnowledgeScreen extends StatefulWidget {
-  const MainKnowledgeScreen({super.key});
-  @override
-  State<MainKnowledgeScreen> createState() => _MainKnowledgeScreenState();
-}
-
-class _MainKnowledgeScreenState extends State<MainKnowledgeScreen> {
-  List lessons = [];
-
-  Future<void> fetchLessons() async {
-    // ⚠️⚠️⚠️ يـا نـمر: اسـتبدل الـرابط أدناه برابط الـ Raw الذي نسخته ⚠️⚠️⚠️
-    const String myRawUrl = "https://github.com/liljemee3-cloud/C_Master_Elite/raw/refs/heads/main/lessons_data.json"; 
-    
-    try {
-      final response = await http.get(Uri.parse(myRawUrl));
-      if (response.statusCode == 200) {
-        setState(() {
-          lessons = json.decode(response.body)['lessons'];
-        });
-      }
-    } catch (e) {
-      print("خطأ في جلب البيانات: $e");
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    fetchLessons();
-  }
+class AcademyHomeScreen extends StatelessWidget {
+  const AcademyHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('أكاديمية C Master', style: TextStyle(color: Colors.black)),
+        title: const Text('أكاديمية C Master الموسوعية', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.orange,
+        centerTitle: true,
       ),
-      body: lessons.isEmpty
-          ? const Center(child: CircularProgressIndicator(color: Colors.orange))
-          : ListView.builder(
-              itemCount: lessons.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: const EdgeInsets.all(10),
-                  color: Colors.grey[900],
-                  child: ListTile(
-                    title: Text(lessons[index]['title'], style: const TextStyle(color: Colors.orange)),
-                    subtitle: Text(lessons[index]['content'], style: const TextStyle(color: Colors.white70)),
-                    onTap: () {
-                      // هنا سنفتح تفاصيل الدرس لاحقاً
-                    },
-                  ),
-                );
-              },
-            ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          children: [
+            VisualAssets.computerModule(), // المكون التفاعلي الذي طلبته
+            const SizedBox(height: 20),
+            const Text("اختر مجال التعلم:", style: TextStyle(color: Colors.orange, fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            // إنشاء أزرار المجالات تلقائياً
+            ...ScienceData.categories.keys.map((category) => Card(
+              color: Colors.grey[900],
+              margin: const EdgeInsets.only(bottom: 10),
+              child: ListTile(
+                leading: const Icon(Icons.star, color: Colors.orange),
+                title: Text(category, style: const TextStyle(color: Colors.white)),
+                onTap: () {
+                  // هنا نفتح صفحة الدروس لهذا المجال
+                },
+              ),
+            )).toList(),
+          ],
+        ),
+      ),
     );
   }
 }
