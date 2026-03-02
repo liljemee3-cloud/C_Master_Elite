@@ -1,6 +1,7 @@
 name: c_master_elite
-description: "Professional Learning App for C, Cyber Security, and AI"
+description: A professional Flutter app for learning C programming.
 publish_to: 'none'
+
 version: 1.0.0+1
 
 environment:
@@ -9,14 +10,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  # المكتبات التي تضمن عمل نظام التحديث والأزرار
+  cupertino_icons: ^1.0.2
+  # المكتبات الضرورية لنظام التحديث والاتصال
   http: ^1.1.0
-  url_launcher: ^6.2.5
+  url_launcher: ^6.2.1
+  package_info_plus: ^8.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^2.0.0
 
 flutter:
   uses-material-design: true
