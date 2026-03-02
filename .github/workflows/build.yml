@@ -11,11 +11,19 @@ jobs:
         with:
           channel: 'stable'
 
+      - name: Recreate Android Files (تجديد النظام)
+        run: |
+          # حذف ملفات أندرويد القديمة المعطوبة
+          rm -rf android
+          # إنشاء ملفات أندرويد جديدة تدعم التحديثات
+          flutter create . --platforms android
+          flutter pub get
+
       - name: Build Final APK
         run: flutter build apk --release --no-tree-shake-icons
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Tiger-Final-Fix
+          name: Tiger-Ultimate-Force
           path: build/app/outputs/flutter-apk/app-release.apk
