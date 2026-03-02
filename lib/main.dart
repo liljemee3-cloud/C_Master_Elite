@@ -1,116 +1,78 @@
 import 'package:flutter/material.dart';
-import 'cyber_c.dart';
-import 'ai_python.dart';
-import 'updater.dart';
+import 'updater.dart'; // تأكد أن ملف updater.dart موجود في نفس المجلد
 
 void main() {
-  runApp(const MaterialApp(
-    home: MainScreen(),
-    debugShowCheckedModeBanner: false,
-  ));
+  runApp(const CMasterApp());
 }
 
-class MainScreen extends StatelessWidget {
-  const MainScreen({super.key});
+class CMasterApp extends StatelessWidget {
+  const CMasterApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'C Master Elite',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.orange,
+        useMaterial3: true,
+      ),
+      home: const HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // فحص التحديث تلقائياً عند فتح التطبيق (اختياري)
+    // AppUpdater.checkForUpdate(context);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text("C Master Elite"),
-        backgroundColor: Colors.amber[900],
-        // أيقونة القائمة الجانبية 🟰 تظهر تلقائياً هنا
+        title: const Text('C Master Elite'),
+        backgroundColor: Colors.orange,
       ),
-      
-      // القائمة الجانبية (Drawer) حيث أخفينا زر التحديث
-      drawer: Drawer(
-        backgroundColor: Colors.grey[900],
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(color: Colors.amber[900]),
-              child: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.terminal, color: Colors.white, size: 50),
-                  SizedBox(height: 10),
-                  Text("إعدادات النظام الذكي والعاقل", style: TextStyle(color: Colors.white, fontSize: 20)),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.cloud_download, color: Colors.amber),
-              title: const Text("ابحث عنه قبل ان تموت تحديثات", style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context); // إغلاق القائمة أولاً
-                AppUpdater().check(context); // تشغيل نظام التحديث الذكي من ملفه
-              },
-            ),
-            const Divider(color: Colors.grey),
-            ListTile(
-              leading: const Icon(Icons.info_outline, color: Colors.grey),
-              title: const Text("الإصدار الحالي هو هذا ←: 1.0.0", style: TextStyle(color: Colors.grey)),
-              onTap: null,
-            ),
-          ],
-        ),
-      ),
-
       body: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.code, size: 80, color: Colors.amber),
-            const SizedBox(height: 40),
-            
-            // زر الدخول لعالم C والأمن السيبراني
-            _buildMenuButton(
-              context, 
-              "اللغة C والأمن السيبراني", 
-              Icons.security, 
-              const CyberCScreen(),
-              Colors.blueGrey[900]!
-            ),
-            
-            const SizedBox(height: 20),
-            
-            // زر الدخول لعالم بايثون والذكاء الاصطناعي
-            _buildMenuButton(
-              context, 
-              "الذكاء الاصطناعي العاقل وبايثون", 
-              Icons.psychology, 
-              const AIPythonScreen(),
-              Colors.indigo[900]!
-            ),
-          ],
+        color: Colors.black, // الخلفية السوداء التي تفضلها
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.code, size: 100, color: Colors.orange),
+              const SizedBox(height: 20),
+              const Text(
+                'مرحباً بك في عالم البرمجة بلغة C',
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              const SizedBox(height: 40),
+              // زر التحديث الأساسي
+              ElevatedButton.icon(
+                onPressed: () {
+                  AppUpdater.checkForUpdate(context);
+                },
+                icon: const Icon(Icons.system_update),
+                label: const Text('فحص وجود تحديثات'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
-
-  // خوارزمية بناء الأزرار الموحدة لتجنب التكرار
-  Widget _buildMenuButton(BuildContext context, String title, IconData icon, Widget screen, Color color) {
-    return SizedBox(
-      width: double.infinity,
-      height: 70,
-      child: ElevatedButton.icon(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          elevation: 5,
-        ),
-        icon: Icon(icon, color: Colors.amber, size: 28),
-        label: Text(
-          title, 
-          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)
-        ),
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
-        },
       ),
     );
   }
